@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Fraud Detection System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --dark-color: #1e293b;
+            --darker-color: #0f172a;
+            --light-color: #f8fafc;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: var(--light-color);
+            padding-top: 80px;
+        }
+        
+        /* ===== Consistent Navbar Styles ===== */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark-color) !important;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .dropdown-menu {
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-item {
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.5rem 2rem;
+            font-weight: 700;
+            border: none;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .card:hover .card-header::before {
+            transform: translateX(100%);
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            border-radius: 16px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            z-index: 1;
+        }
+        
+        .stats-card > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stats-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .model-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .model-header {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 16px 16px 0 0;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .model-metrics {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .accuracy-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 6px solid;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .accuracy-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .accuracy-high {
+            border-color: var(--success-color);
+            color: var(--success-color);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+        }
+        
+        .accuracy-medium {
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+        }
+        
+        .accuracy-low {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+        }
+        
+        .accuracy-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        
+        .error-badge {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .error-badge:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .classification-section {
+            padding: 2rem;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.6);
+        }
+        
+        .classification-report {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1 1 auto;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .classification-report::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .classification-report::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .classification-report::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        .classification-report::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .section-title {
+            font-weight: 800;
+            color: white;
+            margin-bottom: 3rem;
+            text-align: center;
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subsection-title {
+            font-weight: 700;
+            color: white;
+            margin: 4rem 0 2rem 0;
+            text-align: center;
+            font-size: 2rem;
+            opacity: 0.9;
+        }
+        
+        .upload-card {
+            max-width: 700px;
+            margin: 0 auto;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+            color: white;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .form-text {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .table {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark-color);
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            font-weight: 700;
+            text-align: center;
+            padding: 1rem;
+            border: none;
+            font-size: 0.9rem;
+        }
+        
+        .table td {
+            text-align: center;
+            padding: 0.875rem;
+            border: none;
+            font-weight: 500;
+            vertical-align: middle;
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8fafc;
+        }
+        
+        .table-striped tbody tr:nth-of-type(even) {
+            background-color: white;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* ===== Analysis Loading Animation ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        .loading-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 3rem;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .analysis-loader {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+        }
+
+        .loader-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .loader-circle:nth-child(1) { animation-delay: -0.32s; }
+        .loader-circle:nth-child(2) { animation-delay: -0.16s; }
+        .loader-circle:nth-child(3) { animation-delay: -0.08s; }
+        .loader-circle:nth-child(4) { animation-delay: 0s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 6px;
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .progress-text {
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .model-status {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        /* Navbar scroll effect */
+        .navbar-scrolled {
+            background: rgba(255, 255, 255, 0.98) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Consistent Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-shield-alt me-2"></i>
+                CCFD
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Model</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            {{ username }} <i class="fas fa-chevron-down ms-1"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show mt-4 fade-in-up" role="alert">
+                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Upload Section -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-8">
+                <div class="card upload-card fade-in-up">
+                    <div class="card-header text-center">
+                        <h4 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>Dataset Analysis</h4>
+                    </div>
+                    <div class="card-body p-5">
+                        <form action="/predict" method="post" enctype="multipart/form-data" id="analysisForm">
+                            <div class="mb-4">
+                                <label class="form-label">Upload Transaction Dataset</label>
+                                <input class="form-control" type="file" name="file" accept=".csv" required>
+                                <div class="form-text">
+                                    Upload a CSV file containing credit card transaction data with 'Class' column for fraud detection analysis.
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
+                                    <i class="fas fa-rocket me-2"></i>Analyze Dataset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-content">
+                <div class="analysis-loader">
+                    <div class="loader-circle"></div>
+                    <div class="loader-circle"></div>
+                    <div class="loader-circle"></div>
+                    <div class="loader-circle"></div>
+                </div>
+                <h4 class="text-white mt-4 mb-3">Analyzing Dataset</h4>
+                <p class="text-white-50 mb-4">Processing your data with machine learning models...</p>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+                <div class="model-status">
+                    <div class="status-item">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-tree text-info me-2"></i>
+                            <span>Isolation Forest</span>
+                        </div>
+                        <i class="fas fa-spinner fa-spin text-warning"></i>
+                    </div>
+                    <div class="status-item">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-project-diagram text-success me-2"></i>
+                            <span>SVM Model</span>
+                        </div>
+                        <i class="fas fa-spinner fa-spin text-warning"></i>
+                    </div>
+                    <div class="status-item">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-chart-line text-warning me-2"></i>
+                            <span>Logistic Regression</span>
+                        </div>
+                        <i class="fas fa-spinner fa-spin text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        {% if statistical_analysis %}
+        <div class="mt-5">
+            <h1 class="section-title fade-in-up">Analysis Results</h1>
+
+            <!-- Dataset Overview -->
+            <div class="row mb-5 fade-in-up">
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
+                        <div class="stats-number">{{ total_transactions }}</div>
+                        <div class="stats-label">Total Transactions</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                        <div class="stats-number">{{ non_fraudulent_count }}</div>
+                        <div class="stats-label">Legitimate</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">
+                        <div class="stats-number">{{ fraudulent_count }}</div>
+                        <div class="stats-label">Fraudulent</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                        <div class="stats-number">{{ fraud_percentage }}%</div>
+                        <div class="stats-label">Fraud Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistical Analysis -->
+            <div class="row mb-5 fade-in-up">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Dataset Statistics</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                {{ statistical_analysis|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Performance -->
+            <h2 class="subsection-title fade-in-up">Model Performance</h2>
+            <div class="row fade-in-up">
+                <!-- Isolation Forest -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card model-card">
+                        <div class="model-header" style="background: linear-gradient(135deg, var(--info-color), #0891b2);">
+                            <h5 class="mb-0"><i class="fas fa-tree me-2"></i>Isolation Forest</h5>
+                        </div>
+                        <div class="model-metrics">
+                            {% set iso_accuracy = (iso_forest_accuracy * 100)|round(2) %}
+                            <div class="accuracy-circle {% if iso_accuracy > 90 %}accuracy-high{% elif iso_accuracy > 70 %}accuracy-medium{% else %}accuracy-low{% endif %}">
+                                <div class="accuracy-value">{{ iso_accuracy }}%</div>
+                            </div>
+                            <div class="error-badge">Error: {{ (iso_forest_error * 100)|round(2) }}%</div>
+                        </div>
+                        <div class="classification-section">
+                            <h6 class="text-center mb-3 fw-semibold">Classification Report</h6>
+                            <div class="classification-report">
+                                {{ iso_forest_classification_report|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SVM Model -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card model-card">
+                        <div class="model-header" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                            <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>SVM Model</h5>
+                        </div>
+                        <div class="model-metrics">
+                            {% set svm_accuracy = (svm_accuracy * 100)|round(2) %}
+                            <div class="accuracy-circle {% if svm_accuracy > 90 %}accuracy-high{% elif svm_accuracy > 70 %}accuracy-medium{% else %}accuracy-low{% endif %}">
+                                <div class="accuracy-value">{{ svm_accuracy }}%</div>
+                            </div>
+                            <div class="error-badge">Error: {{ (svm_error * 100)|round(2) }}%</div>
+                        </div>
+                        <div class="classification-section">
+                            <h6 class="text-center mb-3 fw-semibold">Classification Report</h6>
+                            <div class="classification-report">
+                                {{ svm_classification_report|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logistic Regression -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card model-card">
+                        <div class="model-header" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Logistic Regression</h5>
+                        </div>
+                        <div class="model-metrics">
+                            {% set logistic_accuracy = (logistic_accuracy * 100)|round(2) %}
+                            <div class="accuracy-circle {% if logistic_accuracy > 90 %}accuracy-high{% elif logistic_accuracy > 70 %}accuracy-medium{% else %}accuracy-low{% endif %}">
+                                <div class="accuracy-value">{{ logistic_accuracy }}%</div>
+                            </div>
+                            <div class="error-badge">Error: {{ (logistic_error * 100)|round(2) }}%</div>
+                        </div>
+                        <div class="classification-section">
+                            <h6 class="text-center mb-3 fw-semibold">Classification Report</h6>
+                            <div class="classification-report">
+                                {{ logistic_classification_report|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const analysisForm = document.getElementById('analysisForm');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 100) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    navbar.classList.remove('navbar-scrolled');
+                }
+            });
+
+            if (analysisForm) {
+                analysisForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Show loading overlay
+                    loadingOverlay.style.display = 'flex';
+                    analyzeBtn.disabled = true;
+                    analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+                    // Simulate progress
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += Math.random() * 8;
+                        if (progress > 85) progress = 85;
+                        
+                        progressFill.style.width = progress + '%';
+                        progressText.textContent = Math.round(progress) + '%';
+                        
+                        if (progress >= 85) {
+                            clearInterval(progressInterval);
+                            // Actually submit the form after showing progress
+                            setTimeout(() => {
+                                analysisForm.submit();
+                            }, 1500);
+                        }
+                    }, 300);
+                });
+            }
+
+            // Close loading overlay on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    loadingOverlay.style.display = 'none';
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = '<i class="fas fa-rocket me-2"></i>Analyze Dataset';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

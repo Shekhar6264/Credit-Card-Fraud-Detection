@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCFD - Credit Card Fraud Detection</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+<style>
+    /* ===== CSS Variables ===== */
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --dark-color: #1e293b;
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    /* ===== Global Styles ===== */
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: #f8fafc;
+        overflow-x: hidden;
+    }
+
+    /* ===== Consistent Navbar Styles ===== */
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color) !important;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: var(--dark-color) !important;
+        margin: 0 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: var(--primary-color) !important;
+    }
+
+    /* ===== Hero Section ===== */
+    .hero-section {
+        background: var(--gradient-primary);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.95;
+        font-weight: 400;
+        line-height: 1.6;
+    }
+
+    .btn-hero {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-hero:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-hero-primary {
+        background: rgba(255, 255, 255, 1);
+        color: var(--primary-color);
+        border: 2px solid white;
+    }
+
+    .btn-hero-primary:hover {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-dark);
+    }
+
+    /* ===== Credit Card Animation ===== */
+    .credit-card-container {
+        position: relative;
+        width: 400px;
+        height: 250px;
+        margin: 0 auto;
+    }
+
+    .credit-card {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        padding: 2rem;
+        color: white;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .credit-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: rotate(45deg) translateX(-100%); }
+        100% { transform: rotate(45deg) translateX(100%); }
+    }
+
+    .card-chip {
+        width: 50px;
+        height: 40px;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .card-number {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        font-weight: 600;
+        margin: 1.5rem 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .card-details {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .card-holder, .card-expiry {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-label {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-bottom: 0.25rem;
+    }
+
+    .card-logo {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        font-size: 1.5rem;
+        opacity: 0.8;
+        z-index: 2;
+    }
+
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    .floating-element {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s infinite ease-in-out;
+    }
+
+    .floating-element:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: -20px;
+        left: -20px;
+        animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        bottom: -10px;
+        right: 30px;
+        animation-delay: -2s;
+    }
+
+    .floating-element:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        top: 50%;
+        left: -10px;
+        animation-delay: -4s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(120deg); }
+        66% { transform: translateY(10px) rotate(240deg); }
+    }
+
+    /* ===== Features Section ===== */
+    .features-section {
+        padding: 6rem 0;
+        background: #f8fafc;
+    }
+
+    .section-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 4rem;
+        color: #64748b;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        text-align: center;
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .feature-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2.5rem;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        background: var(--gradient-primary);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+    }
+
+    .feature-description {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    /* ===== Stats Section ===== */
+    .stats-section {
+        padding: 5rem 0;
+        background: var(--gradient-primary);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle fill="rgba(255,255,255,0.05)" cx="500" cy="500" r="400"/></svg>');
+    }
+
+    .stat-item {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    /* ===== How It Works Section ===== */
+    .how-it-works-section {
+        padding: 6rem 0;
+        background: white;
+    }
+
+    .step-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        position: relative;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .step-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .step-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+    }
+
+    .step-description {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    /* ===== CTA Section ===== */
+    .cta-section {
+        padding: 6rem 0;
+        background: var(--gradient-secondary);
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,0 1000,500 0,1000"/></svg>');
+    }
+
+    .cta-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .cta-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.95;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-cta {
+        background: white;
+        color: var(--dark-color);
+        border: none;
+        padding: 1.2rem 3rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.4);
+        color: var(--dark-color);
+        text-decoration: none;
+    }
+
+    /* ===== Image Gallery Section ===== */
+    .gallery-section {
+        padding: 5rem 0;
+        background: white;
+    }
+
+    .gallery-item {
+        position: relative;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 320px;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+    }
+
+    .gallery-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .gallery-item:hover .gallery-img {
+        transform: scale(1.08);
+    }
+
+    .gallery-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.85));
+        color: white;
+        padding: 2rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover .gallery-caption {
+        transform: translateY(0);
+    }
+
+    /* ===== Footer ===== */
+    .footer-section {
+        background: var(--dark-color);
+        color: white;
+        padding: 4rem 0 2rem;
+    }
+
+    .social-links a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        margin: 0 0.5rem;
+        color: white;
+        text-decoration: none;
+    }
+
+    .social-links a:hover {
+        background: var(--primary-color);
+        transform: translateY(-3px);
+    }
+
+    .copyright {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 2rem;
+        margin-top: 3rem;
+    }
+
+    /* ===== Animation Classes ===== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Navbar scroll effect */
+    .navbar-scrolled {
+        background: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ===== Responsive Design ===== */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .section-title {
+            font-size: 2.2rem;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+        }
+        
+        .cta-title {
+            font-size: 2.2rem;
+        }
+        
+        .credit-card-container {
+            width: 350px;
+            height: 220px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .btn-hero {
+            width: 100%;
+            justify-content: center;
+            margin-right: 0;
+        }
+        
+        .feature-card {
+            margin-bottom: 2rem;
+        }
+        
+        .credit-card-container {
+            width: 300px;
+            height: 200px;
+        }
+        
+        .card-number {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+    <!-- Consistent Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>
+                CCFD
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title">
+                            Advanced Credit Card Fraud Detection
+                        </h1>
+                        <p class="hero-subtitle">
+                            Protect your transactions with our cutting-edge machine learning system. 
+                            Real-time fraud detection with 99.8% accuracy to secure your financial operations.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="/register" class="btn-hero btn-hero-primary">
+                                <i class="fas fa-rocket me-2"></i>Get Started Free
+                            </a>
+                            <button class="btn-hero" onclick="submitDummyLogin()">
+                                <i class="fas fa-play-circle me-2"></i>Live Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="credit-card-container">
+                        <div class="credit-card">
+                            <div class="floating-elements">
+                                <div class="floating-element"></div>
+                                <div class="floating-element"></div>
+                                <div class="floating-element"></div>
+                            </div>
+                            <div class="card-logo">
+                                <i class="fab fa-cc-visa"></i>
+                            </div>
+                            <div class="card-chip"></div>
+                            <div class="card-number">•••• •••• •••• 1234</div>
+                            <div class="card-details">
+                                <div class="card-holder">
+                                    <div class="card-label">CARD HOLDER</div>
+                                    <div>JOHN DOE</div>
+                                </div>
+                                <div class="card-expiry">
+                                    <div class="card-label">EXPIRES</div>
+                                    <div>12/25</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Our System</h2>
+            <p class="section-subtitle">
+                Advanced machine learning algorithms combined with real-time monitoring to protect your transactions
+            </p>
+            
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="feature-title">AI-Powered Detection</h3>
+                        <p class="feature-description">
+                            Advanced machine learning models trained on millions of transactions to identify fraudulent patterns with high accuracy.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="feature-title">Real-Time Analysis</h3>
+                        <p class="feature-description">
+                            Instant fraud detection with average response time of 0.02 seconds, ensuring minimal disruption to legitimate transactions.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature-title">Advanced Analytics</h3>
+                        <p class="feature-description">
+                            Comprehensive dashboards and reports to monitor fraud trends and system performance in real-time.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <div class="stat-number">99.8%</div>
+                        <div class="stat-label">Detection Accuracy</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <div class="stat-number">0.02s</div>
+                        <div class="stat-label">Avg Response Time</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <div class="stat-number">15K+</div>
+                        <div class="stat-label">Transactions Analyzed</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">System Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">
+                Simple three-step process to secure your transactions
+            </p>
+            
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="step-card fade-in-up">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Upload Data</h3>
+                        <p class="step-description">
+                            Upload your transaction dataset in CSV format. Our system automatically processes and prepares the data for analysis.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="step-card fade-in-up">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">AI Analysis</h3>
+                        <p class="step-description">
+                            Multiple machine learning models analyze the data simultaneously to detect fraudulent patterns with high precision.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="step-card fade-in-up">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Get Results</h3>
+                        <p class="step-description">
+                            Receive comprehensive reports with detailed analysis, accuracy metrics, and actionable insights.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Gallery Section -->
+    <section class="gallery-section">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Security In Action</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                             alt="Analytics Dashboard" class="gallery-img">
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-1">Analytics Dashboard</h5>
+                            <p class="mb-0">Real-time insights</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                             alt="Security Layers" class="gallery-img">
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-1">Multi-layer Security</h5>
+                            <p class="mb-0">Advanced protection</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                             alt="Machine Learning" class="gallery-img">
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-1">AI & ML</h5>
+                            <p class="mb-0">Smart detection</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                             alt="24/7 Monitoring" class="gallery-img">
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-1">24/7 Monitoring</h5>
+                            <p class="mb-0">Continuous surveillance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="cta-title">Ready to Secure Your Business?</h2>
+            <p class="cta-subtitle">
+                Join thousands of businesses protecting their financial operations with our advanced fraud detection system.
+            </p>
+            <a href="/register" class="btn-cta">
+                <i class="fas fa-shield-alt me-2"></i>Start Free Trial
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-shield-alt me-2"></i>CCFD
+                    </h5>
+                    <p class="opacity-75">
+                        Advanced credit card fraud detection system using machine learning to protect your transactions in real-time.
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6 mb-4 mb-lg-0">
+                    <h6 class="fw-bold mb-3">Quick Links</h6>
+                    <div class="d-flex flex-column">
+                        <a href="/" class="text-light opacity-75 text-decoration-none mb-2">Home</a>
+                        <a href="#features" class="text-light opacity-75 text-decoration-none mb-2">Features</a>
+                        <a href="/login" class="text-light opacity-75 text-decoration-none">Sign In</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <h6 class="fw-bold mb-3">Contact Info</h6>
+                    <div class="opacity-75">
+                        <p class="mb-2"><i class="fas fa-envelope me-2"></i>support@ccfd.com</p>
+                        <p class="mb-2"><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
+                        <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>New York, NY</p>
+                    </div>
+                </div>
+            </div>
+             <div class="copyright">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 opacity-75">
+                        &copy; 2025 CCFD. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0 opacity-75">
+                        Designed By: Team Arjuna
+                    </p>
+                </div>
+            </div>
+        </div>
+            
+                        
+        </div>
+    </footer>
+
+    <!-- Dummy Login Form -->
+    <form id="dummyLoginForm" action="/login" method="post" style="display: none;">
+        <input type="hidden" name="username" value="dummy">
+        <input type="hidden" name="password" value="dummy">
+    </form>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Dummy Login Function
+        function submitDummyLogin() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('dummyLoginForm').submit();
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navbar background on scroll
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 100) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    navbar.classList.remove('navbar-scrolled');
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add fade-in animation on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in-up');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all feature cards and step cards
+            document.querySelectorAll('.feature-card, .step-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CCFD</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1e293b;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* ===== Global Styles ===== */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* ===== Preloader Styles ===== */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .counter {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .site-teaser {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .circles {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+        }
+
+        .circle-outer {
+            width: 120px;
+            height: 120px;
+            border-top: 2px solid #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+            animation: rotate 2s linear infinite;
+        }
+
+        .circle-inner {
+            top: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            border-left: 2px solid #8b5cf6;
+            border-right: 2px solid #8b5cf6;
+            animation: rotate 1.5s linear infinite reverse;
+        }
+
+        .circle-inner-rotator {
+            top: 40px;
+            left: 40px;
+            width: 40px;
+            height: 40px;
+            border-top: 2px solid #10b981;
+            border-bottom: 2px solid #10b981;
+            animation: rotate 1s linear infinite;
+        }
+
+        .block {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #3b82f6;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .containerA {
+            display: none;
+        }
+
+        /* ===== Navbar Styles ===== */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark-color) !important;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* ===== Hero Section ===== */
+        .dashboard-hero {
+            background: var(--gradient-primary);
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 0 80px;
+            margin-top: 76px;
+        }
+
+        .dashboard-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        /* ===== Stats Section ===== */
+        .stats-section {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* ===== Quick Actions ===== */
+        .actions-section {
+            padding: 4rem 0;
+            background: white;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .action-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* ===== Recent Activity ===== */
+        .activity-section {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* ===== Image Gallery Section ===== */
+        .gallery-section {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 320px;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .gallery-item:hover .gallery-img {
+            transform: scale(1.08);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+            color: white;
+            padding: 2rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+
+        /* ===== Footer ===== */
+        .footer-section {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* ===== Utility Classes ===== */
+        .roboto-thin { font-weight: 100; }
+        .roboto-light { font-weight: 300; }
+        .roboto-regular { font-weight: 400; }
+        .roboto-medium { font-weight: 500; }
+        .roboto-bold { font-weight: 700; }
+        .roboto-black { font-weight: 900; }
+
+        /* ===== Animation Classes ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .dashboard-hero {
+                min-height: 50vh;
+                padding: 100px 0 60px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .action-card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Preloader -->
+    <div class="loader">
+        <h1 class="counter">0</h1>
+        <div class="site-teaser">
+            <span>Loading your dashboard...</span>
+        </div>
+        <div class="circles">
+            <div class="circle circle-outer"></div>
+            <div class="circle circle-inner"></div>
+            <div class="circle circle-inner-rotator"></div>
+            <div class="block"></div>
+        </div>
+    </div>
+
+    <div class="containerA">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="/dashboard">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    CCFD
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Model</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ username }} <i class="fas fa-chevron-down ms-1"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="dashboard-hero">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="hero-content">
+                            <h1 class="welcome-title">
+                                Welcome back, <span class="text-warning">{{ username }}</span>!
+                            </h1>
+                            <p class="welcome-subtitle">
+                                Monitor your fraud detection activities and access advanced machine learning models to protect your transactions.
+                            </p>
+                            <div class="hero-actions">
+                                <a href="/admin" class="btn btn-light btn-lg me-3">
+                                    <i class="fas fa-brain me-2"></i>Access Model
+                                </a>
+                                <a href="/profile" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-cog me-2"></i>Manage Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div class="hero-visual">
+                            <i class="fas fa-chart-line text-white" style="font-size: 8rem; opacity: 0.8;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="stat-number">99.8%</div>
+                            <div class="stat-label">Detection Accuracy</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="stat-number">0.02s</div>
+                            <div class="stat-label">Avg Response Time</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="stat-number">15K+</div>
+                            <div class="stat-label">Transactions Analyzed</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-number">99.9%</div>
+                            <div class="stat-label">System Uptime</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="actions-section">
+            <div class="container">
+                <h2 class="text-center mb-5 fw-bold display-5">Quick Actions</h2>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="action-card">
+                            <div class="action-icon" style="background: var(--gradient-primary);">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">ML Model Analysis</h4>
+                            <p class="text-muted mb-4">
+                                Upload transaction data and analyze it using our advanced machine learning models for fraud detection.
+                            </p>
+                            <a href="/admin" class="action-btn">
+                                <i class="fas fa-rocket me-2"></i>Start Analysis
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="action-card">
+                            <div class="action-icon" style="background: var(--gradient-secondary);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">View Analytics</h4>
+                            <p class="text-muted mb-4">
+                                Access detailed analytics and insights from your previous fraud detection analyses and results.
+                            </p>
+                            <a href="/admin" class="action-btn">
+                                <i class="fas fa-chart-bar me-2"></i>View Reports
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="action-card">
+                            <div class="action-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Account Settings</h4>
+                            <p class="text-muted mb-4">
+                                Manage your profile, update personal information, and configure your account preferences.
+                            </p>
+                            <a href="/profile" class="action-btn">
+                                <i class="fas fa-cog me-2"></i>Manage Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Gallery Section -->
+        <section class="gallery-section">
+            <div class="container">
+                <h2 class="text-center fw-bold mb-5">Security In Action</h2>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Analytics Dashboard" class="gallery-img">
+                            <div class="gallery-caption">
+                                <h5 class="fw-bold mb-1">Analytics Dashboard</h5>
+                                <p class="mb-0">Real-time insights</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Security Layers" class="gallery-img">
+                            <div class="gallery-caption">
+                                <h5 class="fw-bold mb-1">Multi-layer Security</h5>
+                                <p class="mb-0">Advanced protection</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Machine Learning" class="gallery-img">
+                            <div class="gallery-caption">
+                                <h5 class="fw-bold mb-1">AI & ML</h5>
+                                <p class="mb-0">Smart detection</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="24/7 Monitoring" class="gallery-img">
+                            <div class="gallery-caption">
+                                <h5 class="fw-bold mb-1">24/7 Monitoring</h5>
+                                <p class="mb-0">Continuous surveillance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="activity-section">
+            <div class="container">
+                <h2 class="text-center mb-5 fw-bold display-5">Recent Activity</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="activity-card">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-upload"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6 class="fw-bold mb-1">Dataset Uploaded</h6>
+                                    <p class="text-muted mb-0">Successfully uploaded transaction dataset for analysis</p>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6 class="fw-bold mb-1">Analysis Completed</h6>
+                                    <p class="text-muted mb-0">ML model analysis completed with 99.8% accuracy</p>
+                                    <small class="text-muted">1 day ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6 class="fw-bold mb-1">Security Updated</h6>
+                                    <p class="text-muted mb-0">Enhanced security protocols for better protection</p>
+                                    <small class="text-muted">3 days ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-shield-alt me-2"></i>CCFD
+                        </h5>
+                        <p class="opacity-75">
+                            Advanced credit card fraud detection system using machine learning to protect your transactions in real-time.
+                        </p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6 mb-4 mb-lg-0">
+                        <h6 class="fw-bold mb-3">Quick Links</h6>
+                        <div class="d-flex flex-column">
+                            <a href="/home" class="text-light opacity-75 text-decoration-none mb-2">Home</a>
+                            <a href="/admin" class="text-light opacity-75 text-decoration-none mb-2">Model</a>
+                            <a href="/profile" class="text-light opacity-75 text-decoration-none">Profile</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <h6 class="fw-bold mb-3">Contact Info</h6>
+                        <div class="opacity-75">
+                            <p class="mb-2"><i class="fas fa-envelope me-2"></i>support@ccfd.com</p>
+                            <p class="mb-2"><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
+                            <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>New York, NY</p>
+                        </div>
+                    </div>
+                </div>
+                           <div class="copyright">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+            <p class="mb-0 opacity-75">
+                &copy; 2025 CCFD. All rights reserved.
+            </p>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+            <p class="mb-0 opacity-75">
+                Designed By: Team Arjuna
+            </p>
+        </div>
+    </div>
+</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Preloader Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let counter = document.querySelector('.counter');
+            let count = 0;
+            
+            function updateCounter() {
+                if (count < 100) {
+                    count++;
+                    counter.textContent = count + '%';
+                    setTimeout(updateCounter, 20);
+                } else {
+                    document.querySelector('.loader').style.display = 'none';
+                    document.querySelector('.containerA').style.display = 'block';
+                }
+            }
+            
+            updateCounter();
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98) !important';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95) !important';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Add fade-in animation on scroll for gallery items
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all gallery items
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            observer.observe(item);
+        });
+    </script>
+
+</body>
+</html>
