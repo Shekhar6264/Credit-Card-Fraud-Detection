@@ -1,49 +1,101 @@
-3. Set up Python environment:
+# Credit Card Fraud Detection (Flask + ML + MongoDB)
 
-   python -m venv env
-   
-   source `env/bin/activate`   #On Windows use `env\Scripts\activate`
+A machine learning–powered web application for detecting fraudulent credit card transactions.  
+Built using **Flask**, **MongoDB**, and **Scikit-Learn** models such as Isolation Forest, SVC, and Logistic Regression.
 
-5. Install dependencies:
+---
 
-   pip install -r requirements.txt
+## 🚀 Installation & Setup
 
-6. Download the dataset:
+### **1. Clone the repository**
+```bash
+git clone https://github.com/Shekhar6264/Credit-Card-Fraud-Detection.git
+cd Credit-Card-Fraud-Detection
+2. Set up Python environment
+bash
+Copy code
+python -m venv env
+Activate environment
+Windows
 
-   - The dataset used in this project is not included in the repository due to size constraints.
-   - Download the dataset from https://drive.google.com/file/d/1GNxFy8jlTZQLny81XoaYOqfQDQWNFQgh/view?usp=sharing and place it in a directory (data/) in the root of your project.
+bash
+Copy code
+env\Scripts\activate
+Mac/Linux
 
-7. Set up MongoDB:
+bash
+Copy code
+source env/bin/activate
+3. Install dependencies
+bash
+Copy code
+pip install -r requirements.txt
+4. Download the Dataset
+The dataset is not included in this repository due to size constraints.
 
-   - Install MongoDB on your local machine or use a cloud-based MongoDB service.
-   - Configure MongoDB connection URI in app.py or a separate configuration file.
+Download from Google Drive:
+https://drive.google.com/file/d/1GNxFy8jlTZQLny81XoaYOqfQDQWNFQgh/view?usp=sharing
 
-8. Run the application:
+Place it inside:
 
-   python app.py or flask run
+kotlin
+Copy code
+data/
+    creditcard.csv
+5. Set up MongoDB
+Install MongoDB locally or use MongoDB Atlas.
 
-   The application should now be running locally. Access it at http://localhost:5000 in your web browser.
+Configure MongoDB connection URI in app.py (or a separate config file):
 
-Project Structure
------------------
+python
+Copy code
+MONGO_URI = "mongodb://localhost:27017/fraud_db"
+6. Run the application
+bash
+Copy code
+python app.py
+or
 
-- app.py: Flask application setup and routes and Machine learning models and preprocessing scripts..
-- templates/: HTML templates for rendering frontend.
-- static/: CSS stylesheets and other static files.
-- data/: Directory to store the dataset (not included in repository).
+bash
+Copy code
+flask run
+Your app will be available at:
 
-Machine Learning Models
------------------------
+arduino
+Copy code
+http://localhost:5000
+📁 Project Structure
+powershell
+Copy code
+Credit-Card-Fraud-Detection/
+│
+├── app.py                # Flask app + ML prediction logic
+├── requirements.txt
+│
+├── templates/            # Frontend HTML templates
+├── static/               # CSS and assets
+│
+├── data/                 # Dataset folder (user must add)
+└── models/               # Saved ML models (optional)
+🤖 Machine Learning Models
+This project uses the following scikit-learn models:
 
-This project uses the following machine learning models from scikit-learn for fraud detection:
+Isolation Forest
 
-- Isolation Forest
-- Support Vector Classifier (SVC)
-- Logistic Regression
+Support Vector Classifier (SVC)
 
-Libraries used include pandas, Flask, pymongo, bcrypt, and werkzeug for file uploads.
+Logistic Regression
 
-Contributing
-------------
-
-Contributions are welcome! Please fork the repository and create a pull request for any improvements or fixes.
+Libraries Used
+nginx
+Copy code
+pandas
+numpy
+scikit-learn
+Flask
+pymongo
+bcrypt
+werkzeug
+🤝 Contributing
+Contributions are welcome!
+Please fork the repository, make changes, and submit a pull request for any improvements or fixes.
